@@ -34,22 +34,28 @@ Requires `OPENAI_API_KEY` environment variable to be set.
 - **`dataset.py`**: Shared dataset loader that reads JSONL files, transforms `expected_output` to `answer` for GEPA compatibility, and splits into train/val/test sets.
 
 ### Tasks (`src/tasks/`)
-Each task is a subdirectory containing:
-- **`task.py`**: Creates a `TaskImpl` using `SimpleTask` with task-specific config (data path, system prompt, evaluators, executor)
+Each task is a self-contained subdirectory with all task-specific resources:
+- **`task.py`**: Creates a `TaskImpl` using `SimpleTask` with task-specific config
 - **`evaluators.py`**: Defines metric functions and exports `EVALUATORS` list and `PRIMARY_METRIC`
+- **`executor.py`**: Defines the executor (LLM or agent) for the task
+- **`prompt.txt`**: Seed system prompt for optimization
+- **`data.jsonl`**: Training/validation/test data
 
 ### Data Format
-Tasks use JSONL files in `data/` with examples containing `input` and `expected_output` fields. The dataset loader transforms `expected_output` to `answer` for GEPA compatibility. Evaluator metric functions receive examples with `input` and `answer` fields.
+Tasks use JSONL files with examples containing `input` and `expected_output` fields. The dataset loader transforms `expected_output` to `answer` for GEPA compatibility. Evaluator metric functions receive examples with `input` and `answer` fields.
 
 ### Artifacts
 Optimization runs save outputs to `artifacts/<task_name>/run-<timestamp>/`:
-- `optimized_prompt.json`: Best candidate found
+- `optimized_prompt.txt`: Best system prompt found (plain text)
+- `optimized_prompt.json`: Best candidate found (full structure)
 - `metrics.json`: Test set evaluation results
 
 ## Adding a New Task
 
 1. Create `src/tasks/<task_name>/` directory with `__init__.py`
 2. Create `evaluators.py` with metric functions, `EVALUATORS` list, and `PRIMARY_METRIC`
-3. Create `task.py` with `TaskImpl = SimpleTask(...)` configuration, including your custom executor
-4. Add data file at `data/<task_name>.jsonl`
-5. Register in `src/core/registry.py`
+3. Create `executor.py` with your custom executor function
+4. Create `prompt.txt` with the seed system prompt
+5. Create `data.jsonl` with training/validation/test examples
+6. Create `task.py` with `TaskImpl = SimpleTask(...)` configuration
+7. Register in `src/core/registry.py`

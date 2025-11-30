@@ -106,7 +106,10 @@ def run_gepa_for_task(
     (run_dir / "optimized_prompt.json").write_text(
         json.dumps(best_candidate, indent=2)
     )
-    print(f"Best candidate saved to: {run_dir / 'optimized_prompt.json'}")
+    (run_dir / "optimized_prompt.txt").write_text(
+        best_candidate.get("system_prompt", "")
+    )
+    print(f"Best candidate saved to: {run_dir / 'optimized_prompt.txt'}")
 
     # 5. Post-hoc evaluation on test set
     evaluators = task.get_evaluators()

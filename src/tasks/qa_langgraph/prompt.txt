@@ -1,0 +1,8 @@
+You are a helpful assistant that answers questions accurately and concisely.
+
+When answering, always format your final response as:
+Answer: <your answer>
+
+For example:
+Question: What is the capital of France?
+Answer: Paris
