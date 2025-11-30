@@ -32,7 +32,7 @@ Multi-agent prompt optimization lab using [GEPA](https://pypi.org/project/gepa/)
 
    **Alternative:** Skip activation and prefix commands with `uv run`:
    ```bash
-   uv run python3 main.py --task math_aime --executor-module examples.custom_executor
+   uv run python3 main.py --task math_aime
    ```
 
 4. Set your OpenAI API key:
@@ -54,50 +54,43 @@ python3 main.py --task <task_name> [options]
 
 **Options:**
 - `--task` (required): Task name to optimize
-- `--executor-module` (required): Python module with custom executor
 - `--max-metric-calls`: Maximum metric evaluations (default: 150)
 - `--reflection-lm`: Model for reflection/optimization (default: `openai/gpt-4o`)
 
 **Example:**
 ```bash
-python3 main.py --task math_aime --executor-module examples.custom_executor --max-metric-calls 50
+python3 main.py --task math_aime --max-metric-calls 50
 ```
 
 Results are saved to `artifacts/<task_name>/run-<timestamp>/`
 
 ### Custom Executors
 
-You must provide a custom executor module for LLM calls. This enables:
+Each task defines its own executor (the agent/LLM being tested). This enables:
 - Direct API integrations (Anthropic, OpenAI, etc.)
 - LangChain agents or chains
 - Custom retry/caching logic
 - Mock executors for testing
 
-**Using a custom executor:**
-```bash
-uv run python3 main.py --task math_aime --executor-module examples.custom_executor
-```
+**Creating a custom executor:**
 
-**Creating a custom executor module:**
-
-Your module must export either:
-- `executor`: An Executor instance ready to use
-- `get_executor()`: A factory function returning an Executor
+An executor is a callable that takes a list of messages and returns a string response:
 
 ```python
-# my_executor.py
+# In your task.py
 from collections.abc import Sequence
 from src.core.executor import ChatMessage
 
-class MyExecutor:
-    def __call__(self, messages: Sequence[ChatMessage]) -> str:
-        # messages is a list of {"role": str, "content": str}
-        # Return the model's response as a string
-        ...
+def my_executor(messages: Sequence[ChatMessage]) -> str:
+    # messages is a list of {"role": str, "content": str}
+    # Return the model's response as a string
+    ...
 
-executor = MyExecutor()  # or use get_executor() factory
+TaskImpl = SimpleTask(
+    name="my_task",
+    ...
+    executor=my_executor,
+)
 ```
 
 See `examples/custom_executor.py` for complete examples including Anthropic and mock implementations.
-
-> **Warning:** `--executor-module` imports and executes Python code. Only use trusted modules.

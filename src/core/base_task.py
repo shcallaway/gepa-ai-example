@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from typing import Protocol, Sequence, Mapping, Any, Callable
 
 from .dataset import load_dataset
+from .executor import Executor
 
 Example = Mapping[str, Any]
 
@@ -40,6 +41,10 @@ class Task(Protocol):
         """Optional extra kwargs for gepa.optimize."""
         ...
 
+    def get_executor(self) -> Executor:
+        """Return the executor (agent/LLM) for this task."""
+        ...
+
 
 @dataclass
 class SimpleTask:
@@ -53,6 +58,7 @@ class SimpleTask:
             system_prompt="You are a helpful assistant...",
             evaluators=[Evaluator(name="accuracy", metric_fn=accuracy_metric)],
             primary_metric=accuracy_metric,
+            executor=my_executor,
         )
     """
 
@@ -61,6 +67,7 @@ class SimpleTask:
     system_prompt: str
     evaluators: list[Evaluator]
     primary_metric: MetricFn
+    executor: Executor
     train_frac: float = 0.8
     val_frac: float = 0.1
     seed: int = 42
@@ -84,3 +91,6 @@ class SimpleTask:
 
     def get_gepa_kwargs(self) -> dict[str, Any]:
         return {**self.extra_gepa_kwargs}
+
+    def get_executor(self) -> Executor:
+        return self.executor

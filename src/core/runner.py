@@ -6,7 +6,6 @@ import json
 import gepa
 
 from src.core.base_task import Task, Evaluator, Example
-from src.core.executor import Executor
 
 
 def evaluate_candidate_on_testset(
@@ -55,7 +54,6 @@ def evaluate_candidate_on_testset(
 
 def run_gepa_for_task(
     task: Task,
-    executor: Executor,
     reflection_lm: str = "openai/gpt-4o",
     max_metric_calls: int = 150,
     artifacts_root: str = "artifacts",
@@ -64,8 +62,7 @@ def run_gepa_for_task(
     Run GEPA optimization for a given task.
 
     Args:
-        task: The task to optimize.
-        executor: An Executor callable for LLM calls.
+        task: The task to optimize (includes its own executor).
         reflection_lm: Model string for GEPA's internal reflection (passed to GEPA).
         max_metric_calls: Maximum number of metric evaluations.
         artifacts_root: Root directory for saving artifacts.
@@ -73,6 +70,7 @@ def run_gepa_for_task(
     Returns:
         Path to the run directory containing artifacts.
     """
+    executor = task.get_executor()
     task_lm = executor
     eval_executor = executor
 

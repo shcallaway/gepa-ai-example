@@ -1,5 +1,6 @@
 from src.core.base_task import SimpleTask
 from .evaluators import EVALUATORS, PRIMARY_METRIC
+from .executor import executor
 
 TaskImpl = SimpleTask(
     name="math_aime",
@@ -12,4 +13,5 @@ TaskImpl = SimpleTask(
     ),
     evaluators=EVALUATORS,
     primary_metric=PRIMARY_METRIC,
+    executor=executor,
 )
