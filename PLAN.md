@@ -169,7 +169,44 @@ This interface is intentionally small; new agents just implement these methods.
 
 ---
 
-## 5. Task Registry
+## 5. Naming Conventions for Task Modules
+
+To ensure consistency across all task implementations, each task module **must** export members using the following canonical names:
+
+### 5.1 `dataset.py`
+
+| Export Name | Type | Description |
+|-------------|------|-------------|
+| `load_dataset` | `Callable[..., tuple[Sequence[Example], Sequence[Example], Sequence[Example]]]` | Returns `(trainset, valset, testset)` |
+
+### 5.2 `evaluators.py`
+
+| Export Name | Type | Description |
+|-------------|------|-------------|
+| `get_evaluators` | `Callable[[], list[Evaluator]]` | Returns list of evaluators for post-hoc evaluation |
+| `primary_metric` | `MetricFn` | The main metric function used during GEPA optimization |
+
+### 5.3 `task.py`
+
+| Export Name | Type | Description |
+|-------------|------|-------------|
+| `TaskImpl` | `Type[Task]` | The task class implementing the `Task` protocol |
+
+**Example usage in registry:**
+
+```python
+from src.tasks.math_aime.task import TaskImpl as MathAimeTask
+from src.tasks.qa_multistep.task import TaskImpl as MultiStepQATask
+```
+
+This convention allows:
+- **Discoverability**: Developers know exactly what to look for in each file.
+- **Consistency**: All tasks follow the same interface contract.
+- **Refactoring safety**: Internal implementation details can change without affecting imports.
+
+---
+
+## 6. Task Registry
 
 Central mapping from CLI `--task` name to Task class.
 
@@ -179,8 +216,8 @@ Central mapping from CLI `--task` name to Task class.
 from typing import Dict, Callable
 from src.core.base_task import Task
 
-from src.tasks.math_aime.task import MathAimeTask
-from src.tasks.qa_multistep.task import MultiStepQATask
+from src.tasks.math_aime.task import TaskImpl as MathAimeTask
+from src.tasks.qa_multistep.task import TaskImpl as MultiStepQATask
 
 TASK_REGISTRY: Dict[str, Callable[[], Task]] = {
     "math_aime": MathAimeTask,
@@ -202,7 +239,7 @@ To add a new agent later, you just:
 
 ---
 
-## 6. GEPA Runner
+## 7. GEPA Runner
 
 The runner is responsible for:
 
@@ -272,7 +309,7 @@ def run_gepa_for_task(
     return run_dir
 ```
 
-### 6.1 Evaluation helper (conceptual)
+### 7.1 Evaluation helper (conceptual)
 
 Implement `evaluate_candidate_on_testset` in `runner.py` or a separate module:
 
@@ -295,7 +332,7 @@ This makes metrics visible for each run.
 
 ---
 
-## 7. CLI Entrypoint (main.py)
+## 8. CLI Entrypoint (main.py)
 
 The CLI simply:
 
@@ -343,15 +380,15 @@ python main.py --task qa_multistep
 
 ---
 
-## 8. GEPA Default Metric
+## 9. GEPA Default Metric
 
 GEPA's default metric evaluates correctness by comparing model output to `expected_output`. For v1, we rely on this default for optimization. If task-specific evaluation metrics (e.g., F1, custom parsing) diverge significantly from simple correctness matching, customize the metric via `get_gepa_kwargs()` by passing a custom `metric` function to `gepa.optimize`.
 
 ---
 
-## 9. Agent 1: Math AIME Task
+## 10. Agent 1: Math AIME Task
 
-### 9.1 Dataset loader
+### 10.1 Dataset loader
 
 `src/tasks/math_aime/dataset.py`:
 
@@ -371,7 +408,7 @@ Example = Mapping[str, Any]
 def _load_jsonl(path: Path) -> list[Example]:
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
-def load_aime_dataset(
+def load_dataset(
     root: str = "data/math_aime",
     train_frac: float = 0.8,
     val_frac: float = 0.1,
@@ -394,7 +431,7 @@ def load_aime_dataset(
 
 Dataset must match GEPA's expected format for the default adapter (`"input"` and `"expected_output"` keys).
 
-### 9.2 Evaluators
+### 10.2 Evaluators
 
 `src/tasks/math_aime/evaluators.py`:
 
@@ -418,13 +455,16 @@ def accuracy_metric(example: Example, model_output: str) -> float:
     pred = extract_answer(model_output)
     return 1.0 if pred == gold else 0.0
 
+# Canonical export name for the primary metric used during GEPA optimization
+primary_metric = accuracy_metric
+
 def get_evaluators() -> list[Evaluator]:
     return [
         Evaluator(name="accuracy", metric_fn=accuracy_metric, weight=1.0),
     ]
 ```
 
-### 9.3 Task implementation
+### 10.3 Task implementation
 
 `src/tasks/math_aime/task.py`:
 
@@ -435,8 +475,8 @@ def get_evaluators() -> list[Evaluator]:
 from __future__ import annotations
 from typing import Sequence, Any
 from src.core.base_task import Task, Evaluator, Example
-from .dataset import load_aime_dataset
-from .evaluators import get_evaluators, accuracy_metric
+from .dataset import load_dataset
+from .evaluators import get_evaluators, primary_metric
 
 class MathAimeTask(Task):
     name = "math_aime"
@@ -444,7 +484,7 @@ class MathAimeTask(Task):
     def load_datasets(
         self,
     ) -> tuple[Sequence[Example], Sequence[Example], Sequence[Example]]:
-        return load_aime_dataset()
+        return load_dataset()
 
     def make_seed_candidate(self) -> dict:
         return {
@@ -461,14 +501,17 @@ class MathAimeTask(Task):
 
     def get_gepa_kwargs(self) -> dict[str, Any]:
         # Use our parsing-aware metric during optimization
-        return {"metric": accuracy_metric}
+        return {"metric": primary_metric}
+
+# Canonical export name for the task class
+TaskImpl = MathAimeTask
 ```
 
 ---
 
-## 10. Agent 2: Multi-Step QA Task
+## 11. Agent 2: Multi-Step QA Task
 
-### 10.1 Dataset
+### 11.1 Dataset
 
 `src/tasks/qa_multistep/dataset.py`:
 
@@ -488,7 +531,7 @@ Example = Mapping[str, Any]
 def _load_jsonl(path: Path) -> list[Example]:
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
-def load_qa_dataset(
+def load_dataset(
     root: str = "data/qa_multistep",
     train_frac: float = 0.8,
     val_frac: float = 0.1,
@@ -509,7 +552,7 @@ def load_qa_dataset(
     return trainset, valset, testset
 ```
 
-### 10.2 Evaluators
+### 11.2 Evaluators
 
 `src/tasks/qa_multistep/evaluators.py`:
 
@@ -561,6 +604,9 @@ def f1_score(example: Example, model_output: str) -> float:
     recall = common / len(gold_tokens)
     return 2 * precision * recall / (precision + recall)
 
+# Canonical export name for the primary metric used during GEPA optimization
+primary_metric = exact_match
+
 def get_evaluators() -> list[Evaluator]:
     return [
         Evaluator(name="exact_match", metric_fn=exact_match, weight=1.0),
@@ -568,7 +614,7 @@ def get_evaluators() -> list[Evaluator]:
     ]
 ```
 
-### 10.3 Task implementation
+### 11.3 Task implementation
 
 `src/tasks/qa_multistep/task.py`:
 
@@ -579,8 +625,8 @@ def get_evaluators() -> list[Evaluator]:
 from __future__ import annotations
 from typing import Sequence, Any
 from src.core.base_task import Task, Evaluator, Example
-from .dataset import load_qa_dataset
-from .evaluators import get_evaluators, exact_match
+from .dataset import load_dataset
+from .evaluators import get_evaluators, primary_metric
 
 class MultiStepQATask(Task):
     name = "qa_multistep"
@@ -588,7 +634,7 @@ class MultiStepQATask(Task):
     def load_datasets(
         self,
     ) -> tuple[Sequence[Example], Sequence[Example], Sequence[Example]]:
-        return load_qa_dataset()
+        return load_dataset()
 
     def make_seed_candidate(self) -> dict:
         return {
@@ -605,12 +651,15 @@ class MultiStepQATask(Task):
 
     def get_gepa_kwargs(self) -> dict[str, Any]:
         # Use our answer-extracting metric during optimization
-        return {"metric": exact_match}
+        return {"metric": primary_metric}
+
+# Canonical export name for the task class
+TaskImpl = MultiStepQATask
 ```
 
 ---
 
-## 11. Future Extensions
+## 12. Future Extensions
 
 The design is intentionally modular:
 
@@ -631,7 +680,7 @@ The design is intentionally modular:
 
 ---
 
-## 12. Implementation Order (for the developer)
+## 13. Implementation Order (for the developer)
 
 Recommended sequence:
 
