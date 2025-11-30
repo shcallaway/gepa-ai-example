@@ -1,6 +1,17 @@
 """Executor for the qa_multistep task."""
 
+import litellm
+
 
 def executor(messages):
-    """Mock executor that returns a fixed response for testing."""
-    return "Let me work through this step by step.\n\nAnswer: 42"
+    """Execute LLM calls for multi-step question answering.
+
+    Uses GPT-4o-mini for cost-effective reasoning.
+    Expects model output to include 'Answer:' followed by the final answer.
+    """
+    response = litellm.completion(
+        model="openai/gpt-4o-mini",
+        messages=messages,
+        temperature=0.0,
+    )
+    return response.choices[0].message.content
