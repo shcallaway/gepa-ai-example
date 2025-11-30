@@ -1,6 +1,10 @@
 import argparse
 
+from dotenv import load_dotenv
+
 from src.core.registry import get_task
+
+load_dotenv()
 from src.core.runner import run_gepa_for_task
 
 
