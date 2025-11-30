@@ -19,6 +19,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # Virtual environments
 venv/
@@ -33,13 +34,38 @@ env/
 *.swo
 *~
 
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+
+# Type checking
+.mypy_cache/
+.pytype/
+
+# Jupyter
+.ipynb_checkpoints/
+
 # GEPA artifacts (keep structure, ignore run outputs)
 artifacts/**/run-*/
+
+# Logs
+*.log
+logs/
 
 # Environment variables
 .env
 .env.local
+.env.*
 
 # OS
 .DS_Store
 Thumbs.db
+
+# uv
+uv.lock
