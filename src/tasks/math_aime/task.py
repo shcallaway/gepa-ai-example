@@ -3,7 +3,7 @@ from .evaluators import EVALUATORS, PRIMARY_METRIC
 
 TaskImpl = SimpleTask(
     name="math_aime",
-    data_path="data/math_aime/math_aime.jsonl",
+    data_path="data/math_aime.jsonl",
     system_prompt=(
         "You are a helpful assistant that solves AIME-style math problems. "
         "Given a question, think step-by-step and compute the answer. "

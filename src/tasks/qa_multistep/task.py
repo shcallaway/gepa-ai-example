@@ -3,7 +3,7 @@ from .evaluators import EVALUATORS, PRIMARY_METRIC
 
 TaskImpl = SimpleTask(
     name="qa_multistep",
-    data_path="data/qa_multistep/qa_multistep.jsonl",
+    data_path="data/qa_multistep.jsonl",
     system_prompt=(
         "You are an AI assistant that answers complex multi-step questions. "
         "Carefully reason through the question step-by-step, referencing "

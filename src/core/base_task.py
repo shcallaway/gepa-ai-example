@@ -49,7 +49,7 @@ class SimpleTask:
     Example usage:
         TaskImpl = SimpleTask(
             name="math_aime",
-            data_path="data/math_aime/math_aime.jsonl",
+            data_path="data/math_aime.jsonl",
             system_prompt="You are a helpful assistant...",
             evaluators=[Evaluator(name="accuracy", metric_fn=accuracy_metric)],
             primary_metric=accuracy_metric,
