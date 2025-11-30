@@ -222,8 +222,8 @@ from src.core.base_task import Task
 
 def run_gepa_for_task(
     task: Task,
-    task_lm: str = "openai/gpt-4.1-mini",
-    reflection_lm: str = "openai/gpt-5",
+    task_lm: str = "openai/gpt-4o-mini",
+    reflection_lm: str = "openai/gpt-4o",
     max_metric_calls: int = 150,
     artifacts_root: str = "artifacts",
 ) -> Path:
@@ -312,8 +312,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--task", required=True, help="Task name, e.g. math_aime")
     parser.add_argument("--max-metric-calls", type=int, default=150)
-    parser.add_argument("--task-lm", default="openai/gpt-4.1-mini")
-    parser.add_argument("--reflection-lm", default="openai/gpt-5")
+    parser.add_argument("--task-lm", default="openai/gpt-4o-mini")
+    parser.add_argument("--reflection-lm", default="openai/gpt-4o")
     return parser.parse_args()
 
 def main():
@@ -341,9 +341,15 @@ python main.py --task qa_multistep
 
 ---
 
-## 8. Agent 1: Math AIME Task
+## 8. GEPA Default Metric
 
-### 8.1 Dataset loader
+GEPA's default metric evaluates correctness by comparing model output to `expected_output`. For v1, we rely on this default for optimization. If task-specific evaluation metrics (e.g., F1, custom parsing) diverge significantly from simple correctness matching, customize the metric via `get_gepa_kwargs()` by passing a custom `metric` function to `gepa.optimize`.
+
+---
+
+## 9. Agent 1: Math AIME Task
+
+### 9.1 Dataset loader
 
 Use GEPA’s built-in AIME dataset.
 
@@ -374,7 +380,7 @@ def load_aime_dataset(
 
 Dataset should already match GEPA’s expected format for the default adapter (`"input"` and `"expected_output"` keys).
 
-### 8.2 Evaluators
+### 9.2 Evaluators
 
 `src/tasks/math_aime/evaluators.py`:
 
@@ -404,7 +410,9 @@ def get_evaluators() -> list[Evaluator]:
     ]
 ```
 
-### 8.3 Task implementation
+> **Note:** Verify that GEPA's built-in AIME dataset uses `expected_output` values that match the parsed output from the `"### <answer>"` format. If GEPA's AIME example expects structured JSON output instead, consider either (a) adapting the seed prompt to match, or (b) passing `accuracy_metric` as a custom metric via `get_gepa_kwargs()`.
+
+### 9.3 Task implementation
 
 `src/tasks/math_aime/task.py`:
 
@@ -416,7 +424,7 @@ from __future__ import annotations
 from typing import Sequence, Any
 from src.core.base_task import Task, Evaluator, Example
 from .dataset import load_aime_dataset
-from .evaluators import get_evaluators
+from .evaluators import get_evaluators, accuracy_metric
 
 class MathAimeTask(Task):
     name = "math_aime"
@@ -440,15 +448,15 @@ class MathAimeTask(Task):
         return get_evaluators()
 
     def get_gepa_kwargs(self) -> dict[str, Any]:
-        # Using default adapter/metric from GEPA for now.
-        return {}
+        # Use our parsing-aware metric during optimization
+        return {"metric": accuracy_metric}
 ```
 
 ---
 
-## 9. Agent 2: Multi-Step QA Task
+## 10. Agent 2: Multi-Step QA Task
 
-### 9.1 Dataset
+### 10.1 Dataset
 
 `src/tasks/qa_multistep/dataset.py`:
 
@@ -461,7 +469,7 @@ from __future__ import annotations
 from typing import Sequence, Mapping, Any
 from pathlib import Path
 import json
-from random import shuffle
+import random
 
 Example = Mapping[str, Any]
 
@@ -472,10 +480,11 @@ def load_qa_dataset(
     root: str = "data/qa_multistep",
     train_frac: float = 0.8,
     val_frac: float = 0.1,
+    seed: int = 42,
 ) -> tuple[Sequence[Example], Sequence[Example], Sequence[Example]]:
     path = Path(root) / "qa_multistep.jsonl"
     data = _load_jsonl(path)
-    shuffle(data)
+    random.Random(seed).shuffle(data)
 
     n = len(data)
     n_train = int(n * train_frac)
@@ -488,7 +497,7 @@ def load_qa_dataset(
     return trainset, valset, testset
 ```
 
-### 9.2 Evaluators
+### 10.2 Evaluators
 
 `src/tasks/qa_multistep/evaluators.py`:
 
@@ -510,14 +519,20 @@ def normalize(text: str) -> str:
     text = re.sub(r"[^a-z0-9\s]", " ", text)
     return " ".join(text.split())
 
+def extract_answer(text: str) -> str:
+    """Extract text after 'Answer:' prefix, or return full text as fallback."""
+    if "Answer:" in text:
+        return text.split("Answer:")[-1].strip()
+    return text.strip()
+
 def exact_match(example: Example, model_output: str) -> float:
     gold = normalize(example["expected_output"])
-    pred = normalize(model_output)
+    pred = normalize(extract_answer(model_output))
     return 1.0 if gold == pred else 0.0
 
 def f1_score(example: Example, model_output: str) -> float:
     gold_tokens = normalize(example["expected_output"]).split()
-    pred_tokens = normalize(model_output).split()
+    pred_tokens = normalize(extract_answer(model_output)).split()
 
     if not gold_tokens and not pred_tokens:
         return 1.0
@@ -541,7 +556,7 @@ def get_evaluators() -> list[Evaluator]:
     ]
 ```
 
-### 9.3 Task implementation
+### 10.3 Task implementation
 
 `src/tasks/qa_multistep/task.py`:
 
@@ -553,7 +568,7 @@ from __future__ import annotations
 from typing import Sequence, Any
 from src.core.base_task import Task, Evaluator, Example
 from .dataset import load_qa_dataset
-from .evaluators import get_evaluators
+from .evaluators import get_evaluators, exact_match
 
 class MultiStepQATask(Task):
     name = "qa_multistep"
@@ -577,12 +592,13 @@ class MultiStepQATask(Task):
         return get_evaluators()
 
     def get_gepa_kwargs(self) -> dict[str, Any]:
-        return {}
+        # Use our answer-extracting metric during optimization
+        return {"metric": exact_match}
 ```
 
 ---
 
-## 10. Future Extensions
+## 11. Future Extensions
 
 The design is intentionally modular:
 
@@ -603,7 +619,7 @@ The design is intentionally modular:
 
 ---
 
-## 11. Implementation Order (for the developer)
+## 12. Implementation Order (for the developer)
 
 Recommended sequence:
 
