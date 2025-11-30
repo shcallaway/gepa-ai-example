@@ -83,4 +83,4 @@ class SimpleTask:
         return self.evaluators
 
     def get_gepa_kwargs(self) -> dict[str, Any]:
-        return {"metric": self.primary_metric, **self.extra_gepa_kwargs}
+        return {**self.extra_gepa_kwargs}
