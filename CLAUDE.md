@@ -25,7 +25,7 @@ pip install -e .
 ## Architecture
 
 ### Core Framework (`src/core/`)
-- **`base_task.py`**: Defines the `Task` protocol and `SimpleTask` dataclass for declarative task configuration. Tasks provide datasets, seed prompts, evaluators, and GEPA kwargs.
+- **`base_task.py`**: Defines the `Task` protocol and `SimpleTask` dataclass for declarative task configuration. Tasks provide datasets, seed prompts, evaluators, primary metric, and optional extra GEPA kwargs.
 - **`registry.py`**: Maps task names to task implementations. New tasks must be registered here.
 - **`runner.py`**: Orchestrates GEPA optimization: loads data, runs `gepa.optimize()`, evaluates on test set, saves artifacts.
 - **`dataset.py`**: Shared dataset loader that reads JSONL files and splits into train/val/test sets.
@@ -45,7 +45,7 @@ Optimization runs save outputs to `artifacts/<task_name>/run-<timestamp>/`:
 
 ## Adding a New Task
 
-1. Create `src/tasks/<task_name>/` directory
+1. Create `src/tasks/<task_name>/` directory with `__init__.py`
 2. Create `evaluators.py` with metric functions, `EVALUATORS` list, and `PRIMARY_METRIC`
 3. Create `task.py` with `TaskImpl = SimpleTask(...)` configuration
 4. Add data file at `data/<task_name>.jsonl`
