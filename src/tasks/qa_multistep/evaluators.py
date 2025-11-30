@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import Mapping, Any
 from collections import Counter
 import re
 
@@ -45,12 +44,9 @@ def f1_score(example: Example, model_output: str) -> float:
     return 2 * precision * recall / (precision + recall)
 
 
-# Canonical export name for the primary metric used during GEPA optimization
-primary_metric = exact_match
+EVALUATORS = [
+    Evaluator(name="exact_match", metric_fn=exact_match, weight=1.0),
+    Evaluator(name="f1", metric_fn=f1_score, weight=1.0),
+]
 
-
-def get_evaluators() -> list[Evaluator]:
-    return [
-        Evaluator(name="exact_match", metric_fn=exact_match, weight=1.0),
-        Evaluator(name="f1", metric_fn=f1_score, weight=1.0),
-    ]
+PRIMARY_METRIC = exact_match

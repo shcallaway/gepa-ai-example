@@ -7,18 +7,30 @@ import random
 Example = Mapping[str, Any]
 
 
-def _load_jsonl(path: Path) -> list[Example]:
+def load_jsonl(path: Path) -> list[dict]:
+    """Load a JSONL file into a list of dictionaries."""
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
 
 def load_dataset(
-    root: str = "data/qa_multistep",
+    path: str | Path,
     train_frac: float = 0.8,
     val_frac: float = 0.1,
     seed: int = 42,
 ) -> tuple[Sequence[Example], Sequence[Example], Sequence[Example]]:
-    path = Path(root) / "qa_multistep.jsonl"
-    data = _load_jsonl(path)
+    """
+    Load a JSONL dataset and split into train/val/test sets.
+
+    Args:
+        path: Path to the JSONL file
+        train_frac: Fraction of data for training (default 0.8)
+        val_frac: Fraction of data for validation (default 0.1)
+        seed: Random seed for shuffling (default 42)
+
+    Returns:
+        Tuple of (trainset, valset, testset)
+    """
+    data = load_jsonl(Path(path))
     random.Random(seed).shuffle(data)
 
     n = len(data)

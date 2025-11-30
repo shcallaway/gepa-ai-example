@@ -1,6 +1,6 @@
 from __future__ import annotations
-from typing import Mapping, Any
 import re
+
 from src.core.base_task import Evaluator, Example
 
 ANSWER_REGEX = re.compile(r"###\s*([0-9\-\.]+)")
@@ -17,11 +17,8 @@ def accuracy_metric(example: Example, model_output: str) -> float:
     return 1.0 if pred == gold else 0.0
 
 
-# Canonical export name for the primary metric used during GEPA optimization
-primary_metric = accuracy_metric
+EVALUATORS = [
+    Evaluator(name="accuracy", metric_fn=accuracy_metric, weight=1.0),
+]
 
-
-def get_evaluators() -> list[Evaluator]:
-    return [
-        Evaluator(name="accuracy", metric_fn=accuracy_metric, weight=1.0),
-    ]
+PRIMARY_METRIC = accuracy_metric
