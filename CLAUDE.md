@@ -19,8 +19,11 @@ python main.py --task <task_name> [--max-metric-calls N] [--task-lm MODEL] [--re
 
 ### Install dependencies
 ```bash
-pip install -e .
+uv pip install -e .
 ```
+
+### Environment
+Requires `OPENAI_API_KEY` environment variable to be set.
 
 ## Architecture
 
@@ -28,7 +31,7 @@ pip install -e .
 - **`base_task.py`**: Defines the `Task` protocol and `SimpleTask` dataclass for declarative task configuration. Tasks provide datasets, seed prompts, evaluators, primary metric, and optional extra GEPA kwargs.
 - **`registry.py`**: Maps task names to task implementations. New tasks must be registered here.
 - **`runner.py`**: Orchestrates GEPA optimization: loads data, runs `gepa.optimize()`, evaluates on test set, saves artifacts.
-- **`dataset.py`**: Shared dataset loader that reads JSONL files and splits into train/val/test sets.
+- **`dataset.py`**: Shared dataset loader that reads JSONL files, transforms `expected_output` to `answer` for GEPA compatibility, and splits into train/val/test sets.
 
 ### Tasks (`src/tasks/`)
 Each task is a subdirectory containing:
@@ -36,7 +39,7 @@ Each task is a subdirectory containing:
 - **`evaluators.py`**: Defines metric functions and exports `EVALUATORS` list and `PRIMARY_METRIC`
 
 ### Data Format
-Tasks use JSONL files in `data/` with examples containing `input` and `expected_output` fields.
+Tasks use JSONL files in `data/` with examples containing `input` and `expected_output` fields. The dataset loader transforms `expected_output` to `answer` for GEPA compatibility. Evaluator metric functions receive examples with `input` and `answer` fields.
 
 ### Artifacts
 Optimization runs save outputs to `artifacts/<task_name>/run-<timestamp>/`:

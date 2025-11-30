@@ -12,7 +12,7 @@ def extract_answer(text: str) -> str | None:
 
 
 def accuracy_metric(example: Example, model_output: str) -> float:
-    gold = str(example["expected_output"]).strip()
+    gold = str(example["answer"]).strip()
     pred = extract_answer(model_output)
     return 1.0 if pred == gold else 0.0
 

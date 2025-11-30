@@ -19,13 +19,13 @@ def extract_answer(text: str) -> str:
 
 
 def exact_match(example: Example, model_output: str) -> float:
-    gold = normalize(example["expected_output"])
+    gold = normalize(example["answer"])
     pred = normalize(extract_answer(model_output))
     return 1.0 if gold == pred else 0.0
 
 
 def f1_score(example: Example, model_output: str) -> float:
-    gold_tokens = normalize(example["expected_output"]).split()
+    gold_tokens = normalize(example["answer"]).split()
     pred_tokens = normalize(extract_answer(model_output)).split()
 
     if not gold_tokens and not pred_tokens:

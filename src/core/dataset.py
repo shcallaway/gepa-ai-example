@@ -8,8 +8,19 @@ Example = Mapping[str, Any]
 
 
 def load_jsonl(path: Path) -> list[dict]:
-    """Load a JSONL file into a list of dictionaries."""
-    return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+    """Load a JSONL file into a list of dictionaries.
+
+    Transforms 'expected_output' to 'answer' for GEPA compatibility.
+    """
+    data = []
+    for line in path.read_text().splitlines():
+        if line.strip():
+            item = json.loads(line)
+            # GEPA expects 'answer' field, not 'expected_output'
+            if "expected_output" in item and "answer" not in item:
+                item["answer"] = item.pop("expected_output")
+            data.append(item)
+    return data
 
 
 def load_dataset(
