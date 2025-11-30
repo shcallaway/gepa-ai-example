@@ -1,0 +1,20 @@
+{"input": "Alice has 3 apples. Bob gives her 5 more apples. Then Charlie takes away 2 apples. Finally, Alice buys 4 more apples. How many apples does Alice have now?", "expected_output": "10"}
+{"input": "A train leaves Station A at 9:00 AM traveling at 60 mph. Another train leaves Station B, which is 180 miles away, at 10:00 AM traveling toward Station A at 90 mph. At what time do the trains meet?", "expected_output": "11:00 AM"}
+{"input": "John is twice as old as Mary. Five years ago, John was three times as old as Mary. How old is Mary now?", "expected_output": "10"}
+{"input": "A store sells notebooks for $3 each and pens for $2 each. Tom bought 4 notebooks and some pens for a total of $20. How many pens did Tom buy?", "expected_output": "4"}
+{"input": "The sum of three consecutive even integers is 78. What is the largest of these integers?", "expected_output": "28"}
+{"input": "A rectangular garden has a perimeter of 56 meters. If the length is 4 meters more than the width, what is the area of the garden?", "expected_output": "192 square meters"}
+{"input": "Sarah has a collection of coins worth $4.35. She has only quarters and dimes, and she has 24 coins in total. How many quarters does she have?", "expected_output": "13"}
+{"input": "A car travels from City A to City B at 40 mph and returns at 60 mph. What is the average speed for the entire trip?", "expected_output": "48 mph"}
+{"input": "The product of two consecutive positive integers is 182. What is the sum of these two integers?", "expected_output": "27"}
+{"input": "A tank can be filled by pipe A in 4 hours and by pipe B in 6 hours. If both pipes are opened together, how long will it take to fill the tank?", "expected_output": "2.4 hours"}
+{"input": "Maria scored 85, 90, and 78 on her first three tests. What score does she need on her fourth test to have an average of 85?", "expected_output": "87"}
+{"input": "A ladder 10 feet long leans against a wall. The bottom of the ladder is 6 feet from the wall. How high up the wall does the ladder reach?", "expected_output": "8 feet"}
+{"input": "If 40% of a number is 60, what is 75% of that number?", "expected_output": "112.5"}
+{"input": "A baker uses 3 cups of flour for every 2 cups of sugar. If he uses 12 cups of flour, how many cups of sugar does he need?", "expected_output": "8"}
+{"input": "The ratio of boys to girls in a class is 3:5. If there are 24 boys, how many students are in the class?", "expected_output": "64"}
+{"input": "A shirt originally costs $40. It is first discounted by 20%, then the sale price is discounted by an additional 10%. What is the final price?", "expected_output": "$28.80"}
+{"input": "Two numbers have a sum of 50 and a difference of 14. What is the product of these two numbers?", "expected_output": "576"}
+{"input": "A circular pool has a diameter of 14 meters. What is the circumference of the pool? Use pi = 3.14.", "expected_output": "43.96 meters"}
+{"input": "In a class election, candidate A got 45% of the votes, candidate B got 35%, and candidate C got the remaining votes. If there were 200 total votes, how many votes did candidate C receive?", "expected_output": "40"}
+{"input": "A triangle has angles in the ratio 2:3:4. What is the measure of the largest angle?", "expected_output": "80 degrees"}

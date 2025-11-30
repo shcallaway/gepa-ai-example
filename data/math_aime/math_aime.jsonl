@@ -1,0 +1,20 @@
+{"input": "Find the sum of all positive integers n such that n^2 - 19n + 99 is a perfect square.", "expected_output": "38"}
+{"input": "Let S be the set of all positive integers that have four digits in base 2. What is the sum of all elements in S?", "expected_output": "120"}
+{"input": "How many ordered pairs of positive integers (m, n) satisfy gcd(m, n) = 2 and lcm(m, n) = 108?", "expected_output": "4"}
+{"input": "Find the remainder when 2^2023 is divided by 7.", "expected_output": "2"}
+{"input": "The polynomial x^3 - ax^2 + bx - 2010 has three positive integer roots. What is the smallest possible value of a?", "expected_output": "78"}
+{"input": "How many three-digit numbers are divisible by 7 but not by 3?", "expected_output": "86"}
+{"input": "Find the sum of all two-digit positive integers n such that n and n+1 have the same digit sum.", "expected_output": "99"}
+{"input": "In triangle ABC, AB = 13, BC = 14, and CA = 15. Let D be the foot of the altitude from A to BC. Find the length of AD.", "expected_output": "12"}
+{"input": "Find the number of positive integers less than 1000 that are divisible by 6 but not by 9.", "expected_output": "111"}
+{"input": "What is the units digit of 7^2023?", "expected_output": "3"}
+{"input": "How many integers between 1 and 1000 inclusive are not divisible by 2, 3, or 5?", "expected_output": "266"}
+{"input": "Find the sum of all positive divisors of 360.", "expected_output": "1170"}
+{"input": "A circle has center (3, 4) and passes through the origin. What is the radius of the circle?", "expected_output": "5"}
+{"input": "Find the number of ways to arrange the letters in the word MISSISSIPPI.", "expected_output": "34650"}
+{"input": "What is the sum of the first 20 terms of the arithmetic sequence 3, 7, 11, 15, ...?", "expected_output": "820"}
+{"input": "Find the value of log_2(8) + log_2(16).", "expected_output": "7"}
+{"input": "How many perfect squares are there between 100 and 500?", "expected_output": "12"}
+{"input": "Find the greatest common divisor of 252 and 180.", "expected_output": "36"}
+{"input": "What is the least common multiple of 12 and 18?", "expected_output": "36"}
+{"input": "In how many ways can 5 distinct books be arranged on a shelf?", "expected_output": "120"}

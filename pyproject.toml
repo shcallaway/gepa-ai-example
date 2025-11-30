@@ -1,0 +1,11 @@
+[project]
+name = "gepa-ai-example"
+version = "0.1.0"
+description = "Multi-agent prompt optimization lab using GEPA"
+requires-python = ">=3.10"
+dependencies = [
+    "gepa[full]",
+]
+
+[project.scripts]
+gepa-optimize = "main:main"
