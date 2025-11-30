@@ -1,0 +1,15 @@
+{"input": "What is 15% of 80?", "expected_output": "12", "expected_tools": ["calculator"], "max_tool_calls": 1}
+{"input": "What's the weather like in Paris?", "expected_output": "22°C and sunny", "expected_tools": ["weather"], "max_tool_calls": 1}
+{"input": "What is the capital of France?", "expected_output": "Paris", "expected_tools": ["search"], "max_tool_calls": 1}
+{"input": "Calculate 25 * 4 + 10", "expected_output": "110", "expected_tools": ["calculator"], "max_tool_calls": 1}
+{"input": "What's the weather in Tokyo?", "expected_output": "26°C and partly cloudy", "expected_tools": ["weather"], "max_tool_calls": 1}
+{"input": "What is the population of Tokyo?", "expected_output": "approximately 14 million", "expected_tools": ["search"], "max_tool_calls": 1}
+{"input": "If I have $45 and want to leave a 20% tip, how much is the tip?", "expected_output": "9", "expected_tools": ["calculator"], "max_tool_calls": 1}
+{"input": "What's the weather in London?", "expected_output": "15°C and cloudy", "expected_tools": ["weather"], "max_tool_calls": 1}
+{"input": "What is 2 + 2?", "expected_output": "4", "expected_tools": [], "forbidden_tools": ["search", "weather"], "max_tool_calls": 1}
+{"input": "What color is the sky on a clear day?", "expected_output": "blue", "expected_tools": [], "forbidden_tools": ["calculator"], "max_tool_calls": 0}
+{"input": "Calculate (100 - 20) / 4", "expected_output": "20", "expected_tools": ["calculator"], "max_tool_calls": 1}
+{"input": "What's the weather in New York?", "expected_output": "28°C and humid", "expected_tools": ["weather"], "max_tool_calls": 1}
+{"input": "Who created Python programming language?", "expected_output": "Guido van Rossum", "expected_tools": ["search"], "max_tool_calls": 1}
+{"input": "What is 7 * 8?", "expected_output": "56", "expected_tools": ["calculator"], "max_tool_calls": 1}
+{"input": "How many days are in a week?", "expected_output": "7", "expected_tools": [], "forbidden_tools": ["search", "calculator"], "max_tool_calls": 0}
