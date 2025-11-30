@@ -5,6 +5,7 @@ description = "Multi-agent prompt optimization lab using GEPA"
 requires-python = ">=3.10"
 dependencies = [
     "gepa[full]",
+    "langgraph-sdk",
 ]
 
 [project.scripts]

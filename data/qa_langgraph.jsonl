@@ -1,0 +1,15 @@
+{"input": "What is the capital of France?", "expected_output": "Paris"}
+{"input": "What is 2 + 2?", "expected_output": "4"}
+{"input": "What color is the sky on a clear day?", "expected_output": "Blue"}
+{"input": "How many days are in a week?", "expected_output": "7"}
+{"input": "What is the largest planet in our solar system?", "expected_output": "Jupiter"}
+{"input": "What is the chemical symbol for water?", "expected_output": "H2O"}
+{"input": "Who wrote Romeo and Juliet?", "expected_output": "William Shakespeare"}
+{"input": "What is the capital of Japan?", "expected_output": "Tokyo"}
+{"input": "How many continents are there on Earth?", "expected_output": "7"}
+{"input": "What is the square root of 144?", "expected_output": "12"}
+{"input": "What is the largest ocean on Earth?", "expected_output": "Pacific Ocean"}
+{"input": "In what year did World War II end?", "expected_output": "1945"}
+{"input": "What is the speed of light in vacuum (approximately)?", "expected_output": "300000 km/s"}
+{"input": "What is the capital of Australia?", "expected_output": "Canberra"}
+{"input": "How many legs does a spider have?", "expected_output": "8"}
