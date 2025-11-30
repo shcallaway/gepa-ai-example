@@ -16,7 +16,7 @@ python main.py --task <task-name>
 
 **Initial agents:**
 
-1. `math_aime` – solves AIME-style math problems (using GEPA’s built-in AIME dataset).
+1. `math_aime` – solves AIME-style math problems from a custom dataset.
 2. `qa_multistep` – answers complex multi-step Q&A from a custom dataset.
 
 The design should make it easy to add more agents without touching core orchestration logic.
@@ -30,7 +30,7 @@ The design should make it easy to add more agents without touching core orchestr
 
   * `gepa[full]`
 
-    * Provides `gepa.optimize`, example datasets, adapters, and LLM access via LiteLLM.
+    * Provides `gepa.optimize`, adapters, and LLM access via LiteLLM.
   * `litellm` (pulled in via `gepa[full]`) for model calls.
 * **Environment:**
 
@@ -78,6 +78,8 @@ gepa-multi-agent-demo/
         evaluators.py     # EM/F1 metrics
 
   data/
+    math_aime/
+      math_aime.jsonl     # Custom AIME dataset (input/expected_output per line)
     qa_multistep/
       qa_multistep.jsonl  # Custom QA dataset (input/expected_output per line)
 
@@ -351,34 +353,46 @@ GEPA's default metric evaluates correctness by comparing model output to `expect
 
 ### 9.1 Dataset loader
 
-Use GEPA’s built-in AIME dataset.
-
 `src/tasks/math_aime/dataset.py`:
 
-* Calls `gepa.examples.aime.init_dataset()`.
-* Returns `(trainset, valset, testset)`.
-* Optional subsampling for speed during development.
+* Expects a `math_aime.jsonl` file under `data/math_aime`.
+* Each line: JSON with `"input"` (problem text) and `"expected_output"` (numerical answer).
+* Splits into train/val/test.
 
 ```python
+from __future__ import annotations
 from typing import Sequence, Mapping, Any
-import gepa
+from pathlib import Path
+import json
+import random
 
 Example = Mapping[str, Any]
 
-def load_aime_dataset(
-    sample_size: int | None = None,
-) -> tuple[Sequence[Example], Sequence[Example], Sequence[Example]]:
-    trainset, valset, testset = gepa.examples.aime.init_dataset()
+def _load_jsonl(path: Path) -> list[Example]:
+    return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
-    if sample_size is not None:
-        trainset = trainset[:sample_size]
-        valset = valset[:sample_size]
-        testset = testset[:sample_size]
+def load_aime_dataset(
+    root: str = "data/math_aime",
+    train_frac: float = 0.8,
+    val_frac: float = 0.1,
+    seed: int = 42,
+) -> tuple[Sequence[Example], Sequence[Example], Sequence[Example]]:
+    path = Path(root) / "math_aime.jsonl"
+    data = _load_jsonl(path)
+    random.Random(seed).shuffle(data)
+
+    n = len(data)
+    n_train = int(n * train_frac)
+    n_val = int(n * val_frac)
+
+    trainset = data[:n_train]
+    valset = data[n_train:n_train + n_val]
+    testset = data[n_train + n_val:]
 
     return trainset, valset, testset
 ```
 
-Dataset should already match GEPA’s expected format for the default adapter (`"input"` and `"expected_output"` keys).
+Dataset must match GEPA's expected format for the default adapter (`"input"` and `"expected_output"` keys).
 
 ### 9.2 Evaluators
 
@@ -410,8 +424,6 @@ def get_evaluators() -> list[Evaluator]:
     ]
 ```
 
-> **Note:** Verify that GEPA's built-in AIME dataset uses `expected_output` values that match the parsed output from the `"### <answer>"` format. If GEPA's AIME example expects structured JSON output instead, consider either (a) adapting the seed prompt to match, or (b) passing `accuracy_metric` as a custom metric via `get_gepa_kwargs()`.
-
 ### 9.3 Task implementation
 
 `src/tasks/math_aime/task.py`:
@@ -432,7 +444,7 @@ class MathAimeTask(Task):
     def load_datasets(
         self,
     ) -> tuple[Sequence[Example], Sequence[Example], Sequence[Example]]:
-        return load_aime_dataset(sample_size=60)  # adjust or remove sampling
+        return load_aime_dataset()
 
     def make_seed_candidate(self) -> dict:
         return {
@@ -635,7 +647,8 @@ Recommended sequence:
 
 3. **Math AIME Task**
 
-   * Implement `math_aime/dataset.py` using GEPA’s AIME dataset.
+   * Prepare `data/math_aime/math_aime.jsonl` with custom AIME-style problems.
+   * Implement `math_aime/dataset.py` to load the custom dataset.
    * Implement `math_aime/evaluators.py` (accuracy via “### answer”).
    * Implement `math_aime/task.py`.
    * Register `MathAimeTask` in `registry.py`.
