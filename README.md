@@ -56,6 +56,7 @@ python3 main.py --task <task_name> [options]
 - `--task` (required): Task name to optimize
 - `--max-metric-calls`: Maximum metric evaluations (default: 150)
 - `--task-lm`: Model for task execution (default: `openai/gpt-4o-mini`)
+- `--executor-module`: Python module with custom executor (mutually exclusive with `--task-lm`)
 - `--reflection-lm`: Model for reflection/optimization (default: `openai/gpt-4o`)
 
 **Example:**
@@ -64,3 +65,40 @@ python3 main.py --task math_aime --max-metric-calls 50
 ```
 
 Results are saved to `artifacts/<task_name>/run-<timestamp>/`
+
+### Custom Executors
+
+Instead of using LiteLLM model strings, you can provide a custom executor for full control over LLM calls. This enables:
+- Direct API integrations (Anthropic, OpenAI, etc.)
+- LangChain agents or chains
+- Custom retry/caching logic
+- Mock executors for testing
+
+**Using a custom executor:**
+```bash
+uv run python3 main.py --task math_aime --executor-module examples.custom_executor
+```
+
+**Creating a custom executor module:**
+
+Your module must export either:
+- `executor`: An Executor instance ready to use
+- `get_executor()`: A factory function returning an Executor
+
+```python
+# my_executor.py
+from collections.abc import Sequence
+from src.core.executor import ChatMessage
+
+class MyExecutor:
+    def __call__(self, messages: Sequence[ChatMessage]) -> str:
+        # messages is a list of {"role": str, "content": str}
+        # Return the model's response as a string
+        ...
+
+executor = MyExecutor()  # or use get_executor() factory
+```
+
+See `examples/custom_executor.py` for complete examples including Anthropic and mock implementations.
+
+> **Warning:** `--executor-module` imports and executes Python code. Only use trusted modules.
