@@ -42,15 +42,9 @@ def parse_args():
     parser.add_argument("--task", required=True, help="Task name, e.g. math_aime")
     parser.add_argument("--max-metric-calls", type=int, default=150)
 
-    # Executor options (mutually exclusive)
-    executor_group = parser.add_mutually_exclusive_group()
-    executor_group.add_argument(
-        "--task-lm",
-        default="openai/gpt-4o-mini",
-        help="LiteLLM model string for task execution (default: openai/gpt-4o-mini)",
-    )
-    executor_group.add_argument(
+    parser.add_argument(
         "--executor-module",
+        required=True,
         help=(
             "Python module path to load a custom executor from. "
             "Module must export 'executor' or 'get_executor()'. "
@@ -67,13 +61,10 @@ def main():
 
     task = get_task(args.task)
 
-    # Determine executor
-    if args.executor_module:
-        print(f"Loading custom executor from module: {args.executor_module}")
-        print("WARNING: Custom executors execute arbitrary code. Only use trusted modules.")
-        executor = load_executor_from_module(args.executor_module)
-    else:
-        executor = args.task_lm  # String will be wrapped by run_gepa_for_task
+    # Load custom executor
+    print(f"Loading custom executor from module: {args.executor_module}")
+    print("WARNING: Custom executors execute arbitrary code. Only use trusted modules.")
+    executor = load_executor_from_module(args.executor_module)
 
     run_dir = run_gepa_for_task(
         task=task,

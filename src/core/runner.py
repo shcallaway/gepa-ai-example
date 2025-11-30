@@ -6,7 +6,7 @@ import json
 import gepa
 
 from src.core.base_task import Task, Evaluator, Example
-from src.core.executor import Executor, LiteLLMExecutor
+from src.core.executor import Executor
 
 
 def evaluate_candidate_on_testset(
@@ -55,7 +55,7 @@ def evaluate_candidate_on_testset(
 
 def run_gepa_for_task(
     task: Task,
-    executor: Executor | str = "openai/gpt-4o-mini",
+    executor: Executor,
     reflection_lm: str = "openai/gpt-4o",
     max_metric_calls: int = 150,
     artifacts_root: str = "artifacts",
@@ -65,8 +65,7 @@ def run_gepa_for_task(
 
     Args:
         task: The task to optimize.
-        executor: Either an Executor callable or a LiteLLM model string.
-            If a string is provided, it will be wrapped in LiteLLMExecutor.
+        executor: An Executor callable for LLM calls.
         reflection_lm: Model string for GEPA's internal reflection (passed to GEPA).
         max_metric_calls: Maximum number of metric evaluations.
         artifacts_root: Root directory for saving artifacts.
@@ -74,13 +73,8 @@ def run_gepa_for_task(
     Returns:
         Path to the run directory containing artifacts.
     """
-    # Normalize executor: wrap string in LiteLLMExecutor
-    if isinstance(executor, str):
-        task_lm: Executor | str = executor  # Pass string to GEPA
-        eval_executor = LiteLLMExecutor(executor)
-    else:
-        task_lm = executor  # Pass callable to GEPA
-        eval_executor = executor
+    task_lm = executor
+    eval_executor = executor
 
     # 1. Data
     trainset, valset, testset = task.load_datasets()

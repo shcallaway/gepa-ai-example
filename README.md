@@ -32,7 +32,7 @@ Multi-agent prompt optimization lab using [GEPA](https://pypi.org/project/gepa/)
 
    **Alternative:** Skip activation and prefix commands with `uv run`:
    ```bash
-   uv run python3 main.py --task math_aime
+   uv run python3 main.py --task math_aime --executor-module examples.custom_executor
    ```
 
 4. Set your OpenAI API key:
@@ -54,21 +54,20 @@ python3 main.py --task <task_name> [options]
 
 **Options:**
 - `--task` (required): Task name to optimize
+- `--executor-module` (required): Python module with custom executor
 - `--max-metric-calls`: Maximum metric evaluations (default: 150)
-- `--task-lm`: Model for task execution (default: `openai/gpt-4o-mini`)
-- `--executor-module`: Python module with custom executor (mutually exclusive with `--task-lm`)
 - `--reflection-lm`: Model for reflection/optimization (default: `openai/gpt-4o`)
 
 **Example:**
 ```bash
-python3 main.py --task math_aime --max-metric-calls 50
+python3 main.py --task math_aime --executor-module examples.custom_executor --max-metric-calls 50
 ```
 
 Results are saved to `artifacts/<task_name>/run-<timestamp>/`
 
 ### Custom Executors
 
-Instead of using LiteLLM model strings, you can provide a custom executor for full control over LLM calls. This enables:
+You must provide a custom executor module for LLM calls. This enables:
 - Direct API integrations (Anthropic, OpenAI, etc.)
 - LangChain agents or chains
 - Custom retry/caching logic
