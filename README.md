@@ -21,11 +21,21 @@ Multi-agent prompt optimization lab using [GEPA](https://pypi.org/project/gepa/)
 2. Create a virtual environment and install dependencies:
    ```bash
    uv venv
-   source .venv/bin/activate
    uv pip install -e .
    ```
 
-3. Set your OpenAI API key:
+3. Activate the virtual environment (required before running commands):
+   ```bash
+   source .venv/bin/activate  # macOS/Linux
+   # Or use: .venv\Scripts\activate  # Windows
+   ```
+
+   **Alternative:** Skip activation and prefix commands with `uv run`:
+   ```bash
+   uv run python3 main.py --task math_aime
+   ```
+
+4. Set your OpenAI API key:
    ```bash
    export OPENAI_API_KEY="your-api-key-here"
    ```
