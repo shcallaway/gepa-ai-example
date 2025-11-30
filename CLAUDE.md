@@ -10,7 +10,7 @@ This is a multi-agent prompt optimization lab using the GEPA (Generative Evoluti
 
 ### Run optimization
 ```bash
-python main.py --task <task_name> [--max-metric-calls N] [--task-lm MODEL] [--reflection-lm MODEL]
+python3 main.py --task <task_name> [--max-metric-calls N] [--task-lm MODEL] [--reflection-lm MODEL]
 ```
 - `--task`: Required. Task name (e.g., `math_aime`, `qa_multistep`)
 - `--max-metric-calls`: Optimization budget (default: 150)

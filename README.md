@@ -35,7 +35,7 @@ Multi-agent prompt optimization lab using [GEPA](https://pypi.org/project/gepa/)
 Run GEPA prompt optimization for a specific task:
 
 ```bash
-python main.py --task <task_name> [options]
+python3 main.py --task <task_name> [options]
 ```
 
 **Available tasks:**
@@ -50,7 +50,7 @@ python main.py --task <task_name> [options]
 
 **Example:**
 ```bash
-python main.py --task math_aime --max-metric-calls 50
+python3 main.py --task math_aime --max-metric-calls 50
 ```
 
 Results are saved to `artifacts/<task_name>/run-<timestamp>/`
