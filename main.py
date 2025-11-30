@@ -9,8 +9,8 @@ def parse_args():
         description="Run GEPA prompt optimization for a specific task"
     )
     parser.add_argument("--task", required=True, help="Task name, e.g. math_aime")
-    parser.add_argument("--max-metric-calls", type=int, default=150)
-    parser.add_argument("--reflection-lm", default="openai/gpt-4o")
+    parser.add_argument("--max-metric-calls", type=int, default=5)
+    parser.add_argument("--reflection-lm", default="openai/gpt-5")
     return parser.parse_args()
 
 

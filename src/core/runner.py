@@ -54,8 +54,8 @@ def evaluate_candidate_on_testset(
 
 def run_gepa_for_task(
     task: Task,
-    reflection_lm: str = "openai/gpt-4o",
-    max_metric_calls: int = 150,
+    reflection_lm: str = "openai/gpt-5",
+    max_metric_calls: int = 5,
     artifacts_root: str = "artifacts",
 ) -> Path:
     """
